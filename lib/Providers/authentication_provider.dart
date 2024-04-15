@@ -11,6 +11,7 @@ import 'package:task/Screens/home_screen.dart';
 class AuthenticationProvider extends ChangeNotifier{
   final FirebaseAuth auth = FirebaseAuth.instance;
   Stream<User?> get authStateChanges => auth.authStateChanges();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool password = true;
   changePasswordValue(){
@@ -36,7 +37,7 @@ class AuthenticationProvider extends ChangeNotifier{
   }
 
   Future<String> uploadImageToFirebase(String imagePath,String name) async {
-    // Create a reference to the location you want to upload to in Firebase Storage
+    // reference to the location you want to upload to in Firebase Storage
     final Reference ref = FirebaseStorage.instance.ref().child('Profile Images').child('${name}.jpg');
 
     // Upload the file to Firebase Storage
@@ -50,15 +51,12 @@ class AuthenticationProvider extends ChangeNotifier{
   }
 
   bool isLoading = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   registration(TextEditingController name, TextEditingController email, TextEditingController password, TextEditingController confirmPassword, context) async {
     try {
       isLoading = true;
       notifyListeners();
 
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email.text.trim(),
         password: password.text.trim(),
       );

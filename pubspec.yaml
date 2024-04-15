@@ -46,6 +46,8 @@ dependencies:
   panara_dialogs:
   lottie:
   ftoast:
+  flutter_slider_drawer:
+  fluttertoast:
 
 dev_dependencies:
   flutter_test:
