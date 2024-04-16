@@ -56,9 +56,10 @@ class AuthenticationProvider extends ChangeNotifier{
       isLoading = true;
       notifyListeners();
 
-      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-        email: email.text.trim(),
-        password: password.text.trim(),
+      UserCredential userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.text,
+        password: password.text,
       );
 
       if(userCredential.user!.uid!=''){
@@ -73,7 +74,6 @@ class AuthenticationProvider extends ChangeNotifier{
         isLoading = false;
         notifyListeners();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>HomePage()), (route) => false);
-        // Show success dialog
         showDialog(
           context: context,
           builder: (BuildContext context) {

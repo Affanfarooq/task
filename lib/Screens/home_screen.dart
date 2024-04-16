@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+import 'package:provider/provider.dart';
+import 'package:task/Providers/user_provider.dart';
 import 'package:task/Screens/Dashboard.dart';
 import 'package:task/Screens/Profile.dart';
 import 'package:task/Screens/Settings.dart';
@@ -27,13 +29,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-User? user=FirebaseAuth.instance.currentUser;
+  User? user = FirebaseAuth.instance.currentUser;
   int _selectedIndex = 0;
   final List<Widget> _screens = [
     Dashboard(),
-    Profile(),
+    ProfileScreen(),
     Settings(),
   ];
+
+  @override
+  void initState() {
+    final provider = Provider.of<UserProfileProvider>(context, listen: false);
+    provider.fetchUserProfile();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  String _appBarTitle = 'MY TASKS';
+  Icon icon = Icon(Icons.access_alarms_sharp, color: Colors.black38);
 
   @override
   Widget build(BuildContext context) {
@@ -41,25 +54,35 @@ User? user=FirebaseAuth.instance.currentUser;
       body: SliderDrawer(
         appBar: SliderAppBar(
           appBarHeight: 100,
-            isTitleCenter: false,
-            appBarPadding: EdgeInsets.only(top: 45),
-            trailing: IconButton(onPressed: (){
-              FirebaseAuth.instance.signOut();
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>LoginPage()), (route) => false);
-            }, icon: Icon(Icons.logout)),
-            title:
-            Row(
-              children: [
-                text(" MY TASKS", 20, FontWeight.w800, Colors.black),
-                SizedBox(width: 10,),
-                Icon(Icons.access_alarms_sharp,color: Colors.black38,)
-              ],
-            ),
-            appBarColor: Colors.white,),
+          isTitleCenter: false,
+          appBarPadding: EdgeInsets.only(top: 45),
+          trailing: IconButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginPage()),
+                    (route) => false);
+              },
+              icon: Icon(Icons.logout)),
+          title: Row(
+            children: [
+              text(_appBarTitle, 20, FontWeight.w800, Colors.black),
+              SizedBox(
+                width: 10,
+              ),
+              icon
+            ],
+          ),
+          appBarColor: Colors.white,
+        ),
         slider: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.purple.shade100, Colors.deepPurpleAccent.shade100],
+              colors: [
+                Colors.purple.shade100,
+                Colors.deepPurpleAccent.shade100
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -77,7 +100,7 @@ User? user=FirebaseAuth.instance.currentUser;
                 child: CircleAvatar(
                   radius: 57,
                   backgroundImage: Image.network(
-                      'https://nikhilvadoliya.github.io/assets/images/nikhil_1.webp')
+                          'https://nikhilvadoliya.github.io/assets/images/nikhil_1.webp')
                       .image,
                 ),
               ),
@@ -97,19 +120,19 @@ User? user=FirebaseAuth.instance.currentUser;
                 height: 5,
               ),
               ...[
-                Menu(Icons.home, 'Home',(){}),
-                Menu(Icons.add_comment, 'Add Task',(){}),
-                Menu(Icons.check_circle, 'Completed Tasks',(){}),
-                Menu(Icons.pending_actions_rounded, 'Pending Tasks',(){}),
-                Menu(Icons.person, 'Profile',(){}),
-                Menu(Icons.settings, 'Setting',(){}),
-                Menu(Icons.logout, 'LogOut',(){
-                })
-              ].map((menu) => _SliderMenuItem(
-                  title: menu.title,
-                  iconData: menu.iconData,
-                  ontap: menu.onTap,
-                  ))
+                Menu(Icons.home, 'Home', () {}),
+                Menu(Icons.add_comment, 'Add Task', () {}),
+                Menu(Icons.check_circle, 'Completed Tasks', () {}),
+                Menu(Icons.pending_actions_rounded, 'Pending Tasks', () {}),
+                Menu(Icons.person, 'Profile', () {}),
+                Menu(Icons.settings, 'Setting', () {}),
+                Menu(Icons.logout, 'LogOut', () {})
+              ]
+                  .map((menu) => _SliderMenuItem(
+                        title: menu.title,
+                        iconData: menu.iconData,
+                        ontap: menu.onTap,
+                      ))
                   .toList(),
             ],
           ),
@@ -132,31 +155,47 @@ User? user=FirebaseAuth.instance.currentUser;
           onTap: (int index) {
             setState(() {
               _selectedIndex = index;
+              if (index == 0) {
+                _appBarTitle = "MY TASKS";
+                icon = Icon( Icons.access_alarms_sharp, color: Colors.black38);
+              }
+              if (index == 1) {
+                _appBarTitle = "PROFILE";
+                icon = Icon( CupertinoIcons.person, color: Colors.black38);
+              }
+              if (index == 2) {
+                _appBarTitle = "SETTINGS";
+                icon = Icon( CupertinoIcons.settings, color: Colors.black38);
+              }
             });
           },
           currentIndex: _selectedIndex,
           items: [
-            FloatingNavbarItem(icon: Icons.dashboard_outlined, title: 'Dashboard',),
+            FloatingNavbarItem(
+              icon: Icons.dashboard_outlined,
+              title: 'Dashboard',
+            ),
             FloatingNavbarItem(icon: Icons.person_outline, title: 'Profile'),
-            FloatingNavbarItem(icon: CupertinoIcons.settings, title: 'Settings'),
+            FloatingNavbarItem(
+                icon: CupertinoIcons.settings, title: 'Settings'),
           ],
         ),
       ),
     );
   }
 }
+
 class _SliderMenuItem extends StatelessWidget {
   final String title;
   final IconData iconData;
   final Function ontap;
 
-  const _SliderMenuItem(
-      {Key? key,
-        required this.title,
-        required this.iconData,
-        required this.ontap,
-      })
-      : super(key: key);
+  const _SliderMenuItem({
+    Key? key,
+    required this.title,
+    required this.iconData,
+    required this.ontap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +207,7 @@ class _SliderMenuItem extends StatelessWidget {
         onTap: ontap());
   }
 }
+
 class Menu {
   final IconData iconData;
   final String title;

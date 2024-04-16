@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:task/Providers/user_provider.dart';
 import 'package:task/Widgets/textField.dart';
 import 'package:task/firebase_services.dart';
 
@@ -15,10 +17,10 @@ class AddNewTask extends StatefulWidget {
 class _AddNewTaskState extends State<AddNewTask> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  FirebaseServices services=FirebaseServices();
 
   @override
   Widget build(BuildContext context) {
+    final provider=Provider.of<UserProfileProvider>(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(onPressed: (){
@@ -50,18 +52,24 @@ class _AddNewTaskState extends State<AddNewTask> {
             Row(
               children: [
                 Expanded(
-                  child: SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple.shade300,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)
-                        )
-                      ),
-                      onPressed: (){
-                        services.addTask(titleController, descriptionController);
-                      }, child: text("Add Task", 16, FontWeight.w500, Colors.white),),
+                  child: Consumer<UserProfileProvider>(
+                    builder: (context, val, child) {
+                      return SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple.shade700,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)
+                            )
+                          ),
+                          onPressed: (){
+                            provider.addTask(titleController, descriptionController);
+                          }, child: val.isLoading
+                            ? Center(child: CupertinoActivityIndicator(color: Colors.white70,))
+                            : text("Add Task", 16, FontWeight.w500, Colors.white),),
+                      );
+                    }
                   ),
                 ),
               ],

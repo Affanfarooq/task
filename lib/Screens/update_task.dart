@@ -15,7 +15,6 @@ class UpdateTask extends StatefulWidget {
 class _UpdateTaskState extends State<UpdateTask> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  FirebaseServices services=FirebaseServices();
 
   @override
   Widget build(BuildContext context) {

@@ -48,6 +48,7 @@ dependencies:
   ftoast:
   flutter_slider_drawer:
   fluttertoast:
+  timeline_tile:
 
 dev_dependencies:
   flutter_test:

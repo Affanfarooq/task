@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:task/Providers/authentication_provider.dart';
 import 'package:task/Screens/home_screen.dart';
-import 'package:task/Screens/login_screen.dart';
 import 'package:task/Widgets/profileImage.dart';
 import 'package:task/Widgets/textField.dart';
 
@@ -225,8 +224,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     onPressed: () {
                                       if(_formKey.currentState!.validate()){
                                         if(val.profileImage!=''){
-                                          _signUp();
-                                          // val.registration(_nameController, _emailController, _passwordController, _confirmPasswordController,context);
+                                          val.registration(_nameController, _emailController, _passwordController, _confirmPasswordController, context);
                                         }else{
                                           showCupertinoDialog(
                                               context: context,

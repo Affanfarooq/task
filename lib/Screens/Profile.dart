@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+import 'package:provider/provider.dart';
+import 'package:task/Providers/user_provider.dart';
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
+class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Consumer<UserProfileProvider>(
+      builder: (context, userProfileProvider, _) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Name: ${userProfileProvider.userProfile.name}'),
+                Text('Email: ${userProfileProvider.userProfile.email}'),
+                // Add more profile information widgets as needed
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
