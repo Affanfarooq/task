@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:task/Providers/user_provider.dart';
 import 'package:task/Screens/add_newTask.dart';
-import 'package:task/Widgets/taskWidget.dart';
+import 'package:task/Screens/update_task.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-
-import '../Models/user_model.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -20,6 +18,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
+    User? user=FirebaseAuth.instance.currentUser;
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: InkWell(
@@ -54,23 +53,31 @@ class _DashboardState extends State<Dashboard> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Tasks')
+                    .where(user!.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CupertinoActivityIndicator());
                   } else if (snapshot.data!.docs.isEmpty) {
-                    return Row(
-                      children: [
-                        Padding(
-                          padding:
-                          const EdgeInsets.only(left: 15, bottom: 15),
-                          child: Text(
+                    return Padding(
+                      padding:
+                      const EdgeInsets.only(left: 3, top: 15),
+                      child: Column(
+                        children: [
+                          Transform.scale(
+                            scale: 0.6,
+                            child: Opacity(
+                              opacity: 0.2,
+                              child: Image.asset('Images/list.png'),
+                            ),
+                          ),
+                          Text(
                             "No Task Upload Yet",
                             style: TextStyle(
-                                color: Colors.black45, fontSize: 12),
+                                color: Colors.black26, fontSize: 13),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   } else if (snapshot.hasError) {
                     return Center(
@@ -86,6 +93,10 @@ class _DashboardState extends State<Dashboard> {
                       itemBuilder: (context, index) {
                         DocumentSnapshot document = snapshot.data!.docs[index];
                         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                        Timestamp timestamp = data['timestamp'];
+                        DateTime dateTime = timestamp.toDate(); // Convert timestamp to DateTime
+                        String formattedDateTime =
+                        DateFormat.yMMMd().add_jm().format(dateTime);
                         return TimelineTile(
                           lineXY: 0.05,
                           isLast: snapshot.data!.size == index + 1
@@ -115,18 +126,33 @@ class _DashboardState extends State<Dashboard> {
                               child: Padding(
                                 padding: const EdgeInsets.only(
                                     left: 15,
-                                    right: 8,
-                                    bottom: 12,
-                                    top: 12),
+                                    right: 10,
+                                    bottom: 18,
+                                    top: 8),
                                 child: Column(
                                   crossAxisAlignment:
                                   CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      data['title'] ?? '',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.black87),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            data['title'] ?? '',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(onPressed: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (_)=>UpdateTask(titleController: data['title'],descriptionController: data['description'],)));
+                                            }, icon: Icon(Icons.edit_outlined),),
+                                            IconButton(onPressed: (){}, icon: Icon(Icons.delete_outline),)
+                                          ],
+                                        )
+                                      ],
                                     ),
                                     SizedBox(
                                       height: 5,
@@ -134,9 +160,28 @@ class _DashboardState extends State<Dashboard> {
                                     Text(
                                       data['description'] ?? '',
                                       style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 14,
                                           color: Colors.black45),
                                     ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Posted on : ',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black26),
+                                        ),
+                                        Text(
+                                          formattedDateTime,
+                                          style: TextStyle(
+                                              fontSize: 11.5,
+                                              color: Colors.red.shade300),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),

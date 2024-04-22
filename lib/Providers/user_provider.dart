@@ -11,12 +11,24 @@ class UserProfileProvider extends ChangeNotifier {
 
   Future<void> fetchUserProfile() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('Users').doc(uid).get();
-    Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-    _userProfile = UserProfile.fromMap(userData);
-    notifyListeners();
+    try {
+      DocumentSnapshot snapshot =
+      await FirebaseFirestore.instance.collection('Users').doc(uid).get();
+      if (snapshot.exists) {
+        Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>?;
+        if (userData != null) {
+          _userProfile = UserProfile.fromMap(userData);
+          notifyListeners();
+        } else {
+          print('User data is null');
+        }
+      } else {
+        print('Document does not exist');
+      }
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
   }
-
 
   bool isLoading = false;
   final CollectionReference tasksCollection =
@@ -27,8 +39,10 @@ class UserProfileProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
       DocumentReference docRef = tasksCollection.doc();
+      User? user=FirebaseAuth.instance.currentUser;
       await docRef.set({
-        'id': docRef.id,
+        'docId':docRef,
+        'userId': user!.uid,
         'title': title.text,
         'description': description.text,
         'timestamp': FieldValue.serverTimestamp(),
@@ -46,6 +60,7 @@ class UserProfileProvider extends ChangeNotifier {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+
     } catch (e) {
       isLoading = false;
       title.clear();

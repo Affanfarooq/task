@@ -1,23 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:task/Providers/user_provider.dart';
 import 'package:task/Widgets/textField.dart';
-import 'package:task/firebase_services.dart';
 import '../Widgets/text.dart';
 
 class UpdateTask extends StatefulWidget {
-  const UpdateTask({super.key});
+  String titleController;
+  String descriptionController;
+  UpdateTask({super.key, required this.descriptionController,required this.titleController});
 
   @override
   State<UpdateTask> createState() => _UpdateTaskState();
 }
 
 class _UpdateTaskState extends State<UpdateTask> {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    setState(() {
+      title.text=widget.titleController;
+      description.text=widget.descriptionController;
+    });
+    super.initState();
+  }
+
+  TextEditingController title=TextEditingController();
+  TextEditingController description=TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final provider=Provider.of<UserProfileProvider>(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(onPressed: (){
@@ -40,11 +55,11 @@ class _UpdateTaskState extends State<UpdateTask> {
                 Icon(Icons.add_comment_outlined,color: Colors.black38,),
               ],
             ),
-            SizedBox(height: 25,),
+            SizedBox(height: 22,),
             text("What you want to update?", 14, FontWeight.normal, Colors.black45),
             SizedBox(height: 25,),
-            textField(label: "Task Title",controller: titleController),
-            textField(label: "Task Description",lines: 3, controller: descriptionController),
+            textField(label: "Task Title",controller: title),
+            textField(label: "Task Description",lines: 3, controller: description),
             SizedBox(height: 12,),
             Row(
               children: [
@@ -59,7 +74,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                           )
                       ),
                       onPressed: (){
-                        // services.updateTask(titleController, descriptionController, 12);
+                        provider.updateTask(title, description, 12);
                       }, child: text("Update Task", 16, FontWeight.w500, Colors.white),),
                   ),
                 ),
