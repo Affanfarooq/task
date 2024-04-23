@@ -9,7 +9,8 @@ import '../Widgets/text.dart';
 class UpdateTask extends StatefulWidget {
   String titleController;
   String descriptionController;
-  UpdateTask({super.key, required this.descriptionController,required this.titleController});
+  String docId;
+  UpdateTask({super.key, required this.descriptionController,required this.titleController,required this.docId});
 
   @override
   State<UpdateTask> createState() => _UpdateTaskState();
@@ -64,18 +65,25 @@ class _UpdateTaskState extends State<UpdateTask> {
             Row(
               children: [
                 Expanded(
-                  child: SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple.shade300,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)
-                          )
-                      ),
-                      onPressed: (){
-                        provider.updateTask(title, description, 12);
-                      }, child: text("Update Task", 16, FontWeight.w500, Colors.white),),
+                  child: Consumer<UserProfileProvider>(
+                    builder: (context, val, child) {
+                      return SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple.shade400,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)
+                              )
+                          ),
+                          onPressed: (){
+                            provider.updateTask(title, description, widget.docId);
+                          }, child:
+                            val.isLoading
+                            ? Center(child: CupertinoActivityIndicator(color: Colors.white70,))
+                            : text("Update Task", 16, FontWeight.w500, Colors.white),),
+                      );
+                    }
                   ),
                 ),
               ],

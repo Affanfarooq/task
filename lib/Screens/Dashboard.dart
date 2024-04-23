@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Tasks')
-                    .where(user!.uid)
+                    .where('userId',isEqualTo:  user!.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -147,7 +147,7 @@ class _DashboardState extends State<Dashboard> {
                                         Row(
                                           children: [
                                             IconButton(onPressed: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (_)=>UpdateTask(titleController: data['title'],descriptionController: data['description'],)));
+                                              Navigator.push(context, MaterialPageRoute(builder: (_)=>UpdateTask(titleController: data['title'],descriptionController: data['description'],docId: data['docId'],)));
                                             }, icon: Icon(Icons.edit_outlined),),
                                             IconButton(onPressed: (){}, icon: Icon(Icons.delete_outline),)
                                           ],

@@ -41,7 +41,7 @@ class UserProfileProvider extends ChangeNotifier {
       DocumentReference docRef = tasksCollection.doc();
       User? user=FirebaseAuth.instance.currentUser;
       await docRef.set({
-        'docId':docRef,
+        'docId':docRef.id,
         'userId': user!.uid,
         'title': title.text,
         'description': description.text,
@@ -80,13 +80,11 @@ class UserProfileProvider extends ChangeNotifier {
 
   Future<void> updateTask(TextEditingController title, TextEditingController description, id) async {
     try {
-      DocumentReference docRef = tasksCollection.doc(id);
+      DocumentReference docRef = tasksCollection.doc('$id');
       await docRef.update({
         'title': title.text,
         'description': description.text,
       });
-      title.clear();
-      description.clear();
       Fluttertoast.showToast(
         msg: 'Task updated successfully!',
         toastLength: Toast.LENGTH_SHORT,
@@ -107,8 +105,6 @@ class UserProfileProvider extends ChangeNotifier {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      title.clear();
-      description.clear();
     }
   }
 
