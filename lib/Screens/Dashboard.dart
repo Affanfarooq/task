@@ -20,7 +20,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     User? user=FirebaseAuth.instance.currentUser;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey,
       floatingActionButton: InkWell(
         onTap: () {
           Navigator.push(
@@ -64,17 +64,21 @@ class _DashboardState extends State<Dashboard> {
                       const EdgeInsets.only(left: 3, top: 15),
                       child: Column(
                         children: [
-                          Transform.scale(
-                            scale: 0.6,
-                            child: Opacity(
-                              opacity: 0.2,
-                              child: Image.asset('Images/list.png'),
+                          Container(
+                            child: Transform.scale(
+                              scale: 0.6,
+                              child: Opacity(
+                                opacity: 0.2,
+                                child: Image.asset('Images/list.png'),
+                              ),
                             ),
                           ),
                           Text(
                             "No Task Upload Yet",
                             style: TextStyle(
-                                color: Colors.black26, fontSize: 13),
+                              color: Colors.black26,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),

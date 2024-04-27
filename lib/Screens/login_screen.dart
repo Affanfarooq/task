@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     },
                                     child: val.isLoading
-                                        ? Center(child: CupertinoActivityIndicator())
+                                        ? Center(child: CupertinoActivityIndicator(color: Colors.white70,))
                                         : Text(
                                       "LOGIN",
                                       style: TextStyle(color: Colors.white),

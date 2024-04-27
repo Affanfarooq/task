@@ -15,7 +15,6 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text('Name: ${userProfileProvider.userProfile.name}'),
                 Text('Email: ${userProfileProvider.userProfile.email}'),
-                // Add more profile information widgets as needed
               ],
             ),
           ),

@@ -2,14 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task/Providers/theme_changer_provider.dart';
 import 'package:task/Providers/user_provider.dart';
 import 'package:task/Screens/home_screen.dart';
 import 'package:task/Screens/login_screen.dart';
 import 'package:task/firebase_options.dart';
 import 'Providers/authentication_provider.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -18,9 +18,11 @@ void main() async{
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider(),
-        ),
-        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+            create: (_) => AuthenticationProvider()),
+        ChangeNotifierProvider<UserProfileProvider>(
+            create: (_) => UserProfileProvider()),
+        ChangeNotifierProvider<ThemeChanger>(
+            create: (_) => ThemeChanger()),
       ],
       child: MyApp(),
     ),
@@ -39,7 +41,6 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthCheck extends StatefulWidget {
-
   @override
   State<AuthCheck> createState() => _AuthCheckState();
 }
@@ -58,7 +59,8 @@ class _AuthCheckState extends State<AuthCheck> {
             ),
           );
         } else {
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>HomePage()), (route) => false);
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => HomePage()), (route) => false);
         }
       });
     }
