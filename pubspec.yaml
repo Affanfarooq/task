@@ -43,13 +43,14 @@ dependencies:
   firebase_storage:
   floating_bottom_navigation_bar:
   animate_do:
-  panara_dialogs:
-  lottie:
   ftoast:
   flutter_slider_drawer:
   fluttertoast:
   timeline_tile:
   intl:
+  shared_preferences:
+  package_info:
+
 
 dev_dependencies:
   flutter_test:

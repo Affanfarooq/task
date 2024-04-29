@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:task/Models/user_model.dart';
 
 class UserProfileProvider extends ChangeNotifier {
-  late UserProfile _userProfile = UserProfile(name: '', email: '');
+  late UserProfile _userProfile = UserProfile(name: '', email: '', image: '');
 
   UserProfile get userProfile => _userProfile;
 

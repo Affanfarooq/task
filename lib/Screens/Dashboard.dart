@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:task/Providers/theme_changer_provider.dart';
 import 'package:task/Screens/add_newTask.dart';
 import 'package:task/Screens/update_task.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -15,12 +17,14 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
+
 class _DashboardState extends State<Dashboard> {
+
   @override
   Widget build(BuildContext context) {
     User? user=FirebaseAuth.instance.currentUser;
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       floatingActionButton: InkWell(
         onTap: () {
           Navigator.push(
@@ -29,20 +33,22 @@ class _DashboardState extends State<Dashboard> {
         child: Material(
           borderRadius: BorderRadius.circular(12),
           elevation: 10,
-          child: Container(
-            width: 60,
-            height: 58,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.purple.shade800,
-            ),
-            child: Center(
-              child: Icon(
-                Icons.add,
-                color: Colors.white70,
+          child: Consumer<ThemeChanger>(builder: (context, val, child){
+            return Container(
+              width: 60,
+              height: 58,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: val.selectedColor,
               ),
-            ),
-          ),
+              child: Center(
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white70,
+                ),
+              ),
+            );
+          })
         ),
       ),
       body: Padding(
@@ -101,97 +107,99 @@ class _DashboardState extends State<Dashboard> {
                         DateTime dateTime = timestamp.toDate(); // Convert timestamp to DateTime
                         String formattedDateTime =
                         DateFormat.yMMMd().add_jm().format(dateTime);
-                        return TimelineTile(
-                          lineXY: 0.05,
-                          isLast: snapshot.data!.size == index + 1
-                              ? true
-                              : false,
-                          indicatorStyle: IndicatorStyle(
-                            color: Colors.purple.shade100,
-                            indicator: CircleAvatar(
-                                backgroundColor: Colors.purple.shade100,
-                                child: Center(
-                                    child: Text(
-                                      "${index + 1}",
-                                      style: TextStyle(fontSize: 12),
-                                    ))),
-                          ),
-                          beforeLineStyle: LineStyle(
-                              color: Colors.purple.shade400, thickness: 2),
-                          afterLineStyle: LineStyle(
-                              color: Colors.purple.shade400, thickness: 2),
-                          endChild: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 12, left: 13, right: 3),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(6)),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 15,
-                                    right: 10,
-                                    bottom: 18,
-                                    top: 8),
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
+                        return Consumer<ThemeChanger>(builder: (context, val, child){
+                            return TimelineTile(
+                                lineXY: 0.05,
+                                isLast: snapshot.data!.size == index + 1
+                                    ? true
+                                    : false,
+                                indicatorStyle: IndicatorStyle(
+                                  color: Colors.purple.shade100,
+                                  indicator: CircleAvatar(
+                                      backgroundColor: val.selectedColor,
+                                      child: Center(
                                           child: Text(
-                                            data['title'] ?? '',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black87),
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(onPressed: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (_)=>UpdateTask(titleController: data['title'],descriptionController: data['description'],docId: data['docId'],)));
-                                            }, icon: Icon(Icons.edit_outlined),),
-                                            IconButton(onPressed: (){}, icon: Icon(Icons.delete_outline),)
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      data['description'] ?? '',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black45),
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Posted on : ',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black26),
-                                        ),
-                                        Text(
-                                          formattedDateTime,
-                                          style: TextStyle(
-                                              fontSize: 11.5,
-                                              color: Colors.red.shade300),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                                            "${index + 1}",
+                                            style: TextStyle(fontSize: 12,color: val.selectedColor==Colors.black87?Colors.white:Colors.white),
+                                          ))),
                                 ),
-                              ),
-                            ),
-                          ),
-                        );
+                                beforeLineStyle: LineStyle(
+                                    color: val.selectedColor, thickness: 2),
+                                afterLineStyle: LineStyle(
+                                    color: val.selectedColor, thickness: 2),
+                                endChild: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 12, left: 13, right: 3),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(6)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 15,
+                                          right: 10,
+                                          bottom: 18,
+                                          top: 8),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  data['title'] ?? '',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black87),
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  IconButton(onPressed: (){
+                                                    Navigator.push(context, MaterialPageRoute(builder: (_)=>UpdateTask(titleController: data['title'],descriptionController: data['description'],docId: data['docId'],)));
+                                                  }, icon: Icon(Icons.edit_outlined),),
+                                                  IconButton(onPressed: (){}, icon: Icon(Icons.delete_outline),)
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            data['description'] ?? '',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black45),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Posted on : ',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black26),
+                                              ),
+                                              Text(
+                                                formattedDateTime,
+                                                style: TextStyle(
+                                                    fontSize: 11.5,
+                                                    color: Colors.red.shade300),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                          });
                       },
                     );
                   }

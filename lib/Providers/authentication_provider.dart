@@ -5,26 +5,29 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/Screens/home_screen.dart';
 
 
 class AuthenticationProvider extends ChangeNotifier{
+
   final FirebaseAuth auth = FirebaseAuth.instance;
   Stream<User?> get authStateChanges => auth.authStateChanges();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   bool password = true;
+  bool confirmPassword = true;
+  String profileImage = '';
+  bool isLoading = false;
+
   changePasswordValue(){
     password=!password;
     notifyListeners();
   }
-  bool confirmPassword = true;
   changeConfirmPasswordValue(){
     confirmPassword=!confirmPassword;
     notifyListeners();
   }
 
-  String profileImage = '';
   Future getProfileImage() async {
     final ImagePicker picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 15);
@@ -37,7 +40,7 @@ class AuthenticationProvider extends ChangeNotifier{
   }
 
   Future<String> uploadImageToFirebase(String imagePath,String name) async {
-    // reference to the location you want to upload to in Firebase Storage
+    // reference to the location in Firebase Storage
     final Reference ref = FirebaseStorage.instance.ref().child('Profile Images').child('${name}.jpg');
 
     // Upload the file to Firebase Storage
@@ -50,8 +53,8 @@ class AuthenticationProvider extends ChangeNotifier{
     return url;
   }
 
-  bool isLoading = false;
   registration(TextEditingController name, TextEditingController email, TextEditingController password, TextEditingController confirmPassword, context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       isLoading = true;
       notifyListeners();
@@ -74,6 +77,8 @@ class AuthenticationProvider extends ChangeNotifier{
         isLoading = false;
         notifyListeners();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>HomePage()), (route) => false);
+        prefs.setBool('isDarkMode', false);
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -157,6 +162,7 @@ class AuthenticationProvider extends ChangeNotifier{
   }
 
   Future<void> loginUser(TextEditingController email, TextEditingController password, context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       // Start loading state
       isLoading = true;
@@ -173,7 +179,8 @@ class AuthenticationProvider extends ChangeNotifier{
         isLoading = false;
         notifyListeners();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>HomePage()), (route) => false);
-        // Show success dialog
+        prefs.setBool('isDarkMode', false);
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -227,5 +234,21 @@ class AuthenticationProvider extends ChangeNotifier{
       );
     }
 
+  }
+
+  Future<void> updateProfileImage(String imagePath, String name) async {
+    // Reference to the location of the existing profile image in Firebase Storage
+    final Reference ref = FirebaseStorage.instance.ref().child('Profile Images').child('${name}.jpg');
+
+    // Delete the existing profile image
+    await ref.delete();
+
+    // Upload the new profile image
+    final String imageUrl = await uploadImageToFirebase(imagePath, name);
+
+    // Update the profile image URL in Firestore
+    await _firestore.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).update({
+      'image': imageUrl,
+    });
   }
 }
